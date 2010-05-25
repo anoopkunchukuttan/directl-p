@@ -1,27 +1,30 @@
-
 ## STLport is the location of STLport ##
 ## the library can be download from 
 ## http://www.stlport.org/
-STLport=./STLport-5.2.1
+## location of STLport library without '/' at the end
+STLport=<your STLport location>
 
 ## SVMsrc is the SVMlight source code 
 ## which can be downloaded from
 ## http://svmlight.joachims.org/
-## svm_common.c svm_hideo.c svm_learn.c
-## speficied here but you need to put these files and also with
-## kernel.h svm_common.h svm_learn.h 
-## in the same location
-SVMsrc=svm_common.c svm_hideo.c svm_learn.c
+## location of SVMlight without '/' at the end
+SVMlight=<your SVMlight location>
 
 ## tclap library
+## included in the package, shouldn't be edited
 TCLAP=./tclap-1.2.0
 
-## g++ options for code optimization
+## g++/gcc options for code optimization
 GNUREC=-O3 -ffast-math -funroll-all-loops -fpeel-loops -ftracer -funswitch-loops -funit-at-a-time -pthread
 GO=$(GNUREC)
 
+## these lines shouldn't be edited,
+SVMsrc=svm_hideo.c svm_common.c svm_learn.c 
+SVMh=svm_common.h svm_learn.h kernel.h
+
 ## g++ 
-CC=g++ $(GO) 
+CC=g++ $(GO)
+GCC=gcc $(GO)
 
 INCLUDES=-I$(TCLAP)/include/ -I$(STLport)/stlport
 LIBS=-L$(STLport)/lib
@@ -35,13 +38,31 @@ L2Pobj=$(L2Psrc:.cpp=.o)
 OBJECTS=$(SVMobj) $(L2Pobj)
 EXECUTABLE=directlp
 
-all: $($SOURCES) $(EXECUTABLE)
+all: SVM_light $($SOURCES) $(EXECUTABLE)
+
+SVM_light: $(SVMsrc) $(SVMh)
+
+$(SVMsrc): 
+	## copy over needed SVM-light source codes ##
+	cp $(SVMlight)/$@ $@
+
+$(SVMh): 
+	## modified SVM-light head files ##
+	sed "1 i #ifdef __cplusplus \nextern \"C\" { \n#endif"  $(SVMlight)/$@ > $@-tmp
+	sed "$$ a #ifdef __cplusplus \n} \n#endif" $@-tmp > $@
+	rm $@-tmp
+	
 
 $(EXECUTABLE):	$(OBJECTS) 
+	## linking ##
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ $(INLIBS)
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+	## compiling C++ codes ##
+	$(CC) $(CFLAGS) $< -o $@ 
+.c.o:
+	## compiling C codes ##
+	$(GCC) $(CFLAGS) $< -o $@
 
 clean:	
-	rm -f $(EXECUTABLE) $(OBJECTS)
+	rm -f $(EXECUTABLE) $(OBJECTS) $(SVMsrc) $(SVMh)
