@@ -20,6 +20,8 @@
 
 using namespace std;
 
+void set_default_parameters(LEARN_PARM *learn_parm, KERNEL_PARM *kernel_parm);
+
 class phraseModel
 {
 	weightWF myWF;
