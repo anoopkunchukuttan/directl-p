@@ -127,8 +127,9 @@ inline void Tokenize(const string& str,
 			sout = sout + *iter + delimeter;
 		 }
 	 }
-	 sout.erase(sout.end() - delimeter.length(), sout.end());
-
+   if (sout.size() > 0) {
+	   sout.erase(sout.end() - delimeter.length(), sout.end());
+   }
 	 return sout;
  }
 
