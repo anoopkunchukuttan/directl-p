@@ -128,9 +128,9 @@ inline void Tokenize(const string& str,
 		 }
 	 }
    if (sout.size() > 0) {
-	   sout.erase(sout.end() - delimeter.length(), sout.end());
+     sout.erase(sout.end() - delimeter.length(), sout.end());
    }
-	 return sout;
+   return sout;
  }
 
   template<typename T>
